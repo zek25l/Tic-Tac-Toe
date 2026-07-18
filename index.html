@@ -1,824 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Little Valley Farm</title>
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
-
-:root{
-  --sky-top:#8fcdea;
-  --sky-bottom:#ffe3a3;
-  --grass:#5a8f3c;
-  --grass-dark:#4a7530;
-  --soil:#6b4226;
-  --soil-dark:#4a2e1a;
-  --wood:#8b5a2b;
-  --wood-dark:#5c3a1a;
-  --wood-light:#a8763f;
-  --cream:#fdf3dd;
-  --gold:#ffc93c;
-  --berry:#c1440e;
-  --ink:#3a2415;
-}
-
-*{box-sizing:border-box;}
-
-body{
-  margin:0;
-  min-height:100vh;
-  background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-bottom) 65%,var(--grass) 65%,var(--grass-dark) 100%);
-  color:var(--cream);
-  font-family:'VT323',monospace;
-  font-size:22px;
-  overflow-x:hidden;
-}
-
-.pixel{font-family:'Press Start 2P';}
-
-@keyframes titleGlow{
-  0%,100%{text-shadow:0 0 6px rgba(255,201,60,0.4);}
-  50%{text-shadow:0 0 18px rgba(255,201,60,0.9);}
-}
-@keyframes floatSlow{
-  0%,100%{transform:translateY(0);}
-  50%{transform:translateY(-6px);}
-}
-@keyframes fall{
-  from{transform:translateY(-20px) rotate(0deg);opacity:1;}
-  to{transform:translateY(460px) rotate(360deg);opacity:0;}
-}
-@keyframes floatUp{
-  from{transform:translate(-50%,0);opacity:1;}
-  to{transform:translate(-50%,-46px);opacity:0;}
-}
-@keyframes popGrow{
-  0%{transform:scale(0.55);}
-  55%{transform:scale(1.18);}
-  100%{transform:scale(1);}
-}
-@keyframes sparklePop{
-  0%{transform:scale(0.4) rotate(0deg);opacity:0;}
-  40%{transform:scale(1.3) rotate(20deg);opacity:1;}
-  100%{transform:scale(1) rotate(0deg);opacity:0;}
-}
-@keyframes idleSway{
-  0%,100%{transform:rotate(0deg);}
-  50%{transform:rotate(3deg);}
-}
-@keyframes shakeIt{
-  10%,90%{transform:translateX(-2px);}
-  20%,80%{transform:translateX(3px);}
-  30%,50%,70%{transform:translateX(-4px);}
-  40%,60%{transform:translateX(4px);}
-}
-@keyframes toastIn{
-  from{transform:translate(-50%,-16px);opacity:0;}
-  to{transform:translate(-50%,0);opacity:1;}
-}
-@keyframes toastOut{
-  from{transform:translate(-50%,0);opacity:1;}
-  to{transform:translate(-50%,-16px);opacity:0;}
-}
-@keyframes dayFade{
-  0%{opacity:0;}
-  50%{opacity:1;}
-  100%{opacity:0;}
-}
-@keyframes btnPress{
-  0%{transform:scale(1);}
-  50%{transform:scale(0.93);}
-  100%{transform:scale(1);}
-}
-@keyframes pulseStat{
-  0%{transform:scale(1);}
-  30%{transform:scale(1.12);}
-  100%{transform:scale(1);}
-}
-
-.header{
-  background:var(--wood-dark);
-  padding:12px 16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  flex-wrap:wrap;
-  gap:10px;
-  border-bottom:6px solid var(--wood);
-  box-shadow:0 4px 0 rgba(0,0,0,0.25);
-  position:relative;
-  z-index:5;
-}
-
-.stat{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  background:var(--wood);
-  padding:6px 12px;
-  border-radius:6px;
-  border:2px solid var(--wood-light);
-  font-size:20px;
-  white-space:nowrap;
-}
-.stat.pulse{animation:pulseStat .35s ease;}
-
-.stat .pixel{font-size:11px;}
-
-.energybar-wrap{width:90px;height:12px;background:var(--soil-dark);border-radius:4px;overflow:hidden;border:1px solid var(--wood-light);}
-.energybar-fill{height:100%;background:linear-gradient(90deg,#8fe36a,#4fae2e);transition:width .3s;}
-
-.main{display:flex;gap:0;min-height:calc(100vh - 76px);}
-
-.field-wrap{
-  flex:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:24px;
-  position:relative;
-  overflow:hidden;
-}
-
-.weather-particle{
-  position:absolute;
-  top:-20px;
-  font-size:18px;
-  pointer-events:none;
-  animation:fall linear forwards;
-  z-index:3;
-}
-
-.day-transition{
-  position:fixed;
-  inset:0;
-  background:#0b0f1f;
-  pointer-events:none;
-  opacity:0;
-  z-index:1500;
-}
-.day-transition.playing{animation:dayFade 0.9s ease;}
-
-.grid{
-  display:grid;
-  gap:3px;
-  background:var(--soil-dark);
-  padding:10px;
-  border-radius:10px;
-  border:6px solid var(--wood);
-  box-shadow:0 6px 0 rgba(0,0,0,0.3);
-  position:relative;
-  z-index:2;
-}
-
-.plot{
-  width:42px;height:42px;
-  background:var(--grass);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:20px;
-  border-radius:4px;
-  cursor:pointer;
-  position:relative;
-  transition:transform .08s,background .2s;
-  border:1px solid rgba(0,0,0,0.15);
-}
-.plot:hover{transform:scale(1.1);}
-.plot.tilled{background:var(--soil);}
-.plot.watered{background:#4a3620;box-shadow:inset 0 0 0 2px #6fa8e0;}
-.plot.growing span.crop-icon{display:inline-block;animation:idleSway 2.4s ease-in-out infinite;}
-.plot .crop-icon.pop{animation:popGrow .25s ease;}
-.plot .sparkle-fx{
-  position:absolute;
-  font-size:20px;
-  animation:sparklePop .5s ease forwards;
-  pointer-events:none;
-}
-.plot .float-money{
-  position:absolute;
-  top:0;left:50%;
-  font-size:15px;
-  color:var(--gold);
-  font-family:'Press Start 2P';
-  font-size:10px;
-  animation:floatUp .8s ease forwards;
-  pointer-events:none;
-  white-space:nowrap;
-  text-shadow:1px 1px 0 #000;
-}
-.plot.shake{animation:shakeIt .4s ease;}
-
-.sidebar{
-  width:270px;
-  background:var(--wood-dark);
-  padding:14px;
-  overflow-y:auto;
-  border-left:6px solid var(--wood);
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-.panel{
-  background:var(--wood);
-  border:2px solid var(--wood-light);
-  border-radius:8px;
-  padding:10px;
-}
-.panel h4{
-  margin:0 0 8px;
-  font-size:13px;
-  color:var(--gold);
-  letter-spacing:1px;
-}
-
-.shop-item,.tool,button{
-  width:100%;
-  margin:4px 0;
-  padding:9px 10px;
-  background:var(--soil);
-  border:2px solid var(--soil-dark);
-  color:var(--cream);
-  cursor:pointer;
-  font-family:'VT323',monospace;
-  font-size:19px;
-  border-radius:6px;
-  text-align:left;
-  transition:background .15s,transform .08s;
-}
-.shop-item:hover,.tool:hover,button:hover{background:#8a5b32;}
-.shop-item:active,.tool:active,button:active{animation:btnPress .18s ease;}
-.shop-item.disabled{opacity:.4;cursor:not-allowed;}
-.shop-item.disabled:hover{background:var(--soil);}
-
-.tool.active{outline:3px solid var(--gold);background:#8a5b32;}
-.selected-seed{outline:3px solid #6fd1e0;}
-
-.big-btn{
-  background:var(--berry);
-  border:2px solid #7a2a09;
-  font-size:20px;
-  text-align:center;
-}
-.big-btn:hover{background:#d9531a;}
-
-#loginScreen{
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  background:linear-gradient(180deg,var(--sky-top),var(--sky-bottom) 60%,var(--grass) 60%,var(--grass-dark) 100%);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  z-index:2000;
-  gap:14px;
-  padding:20px;
-  text-align:center;
-  overflow:hidden;
-}
-#loginScreen .box{
-  background:var(--wood);
-  border:4px solid var(--wood-light);
-  border-radius:10px;
-  padding:28px;
-  max-width:340px;
-  position:relative;
-  z-index:2;
-  box-shadow:0 8px 0 rgba(0,0,0,0.25);
-}
-#loginScreen h2{
-  font-size:16px;
-  color:var(--gold);
-  animation:titleGlow 2.4s ease-in-out infinite,floatSlow 3s ease-in-out infinite;
-}
-#loginScreen input{
-  width:100%;
-  padding:10px;
-  margin:8px 0;
-  font-family:'VT323',monospace;
-  font-size:20px;
-  border-radius:6px;
-  border:2px solid var(--soil-dark);
-}
-#loginMsg{color:#ffb3b3;min-height:20px;}
-
-.toast-layer{
-  position:fixed;
-  top:14px;left:50%;
-  transform:translateX(-50%);
-  z-index:3000;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  align-items:center;
-  pointer-events:none;
-}
-.toast{
-  background:var(--wood);
-  border:2px solid var(--gold);
-  color:var(--cream);
-  padding:10px 18px;
-  border-radius:8px;
-  font-size:18px;
-  box-shadow:0 4px 0 rgba(0,0,0,0.3);
-  animation:toastIn .25s ease;
-  white-space:nowrap;
-}
-.toast.out{animation:toastOut .3s ease forwards;}
-
-.hidden{display:none !important;}
-
-::-webkit-scrollbar{width:10px;}
-::-webkit-scrollbar-thumb{background:var(--wood-light);border-radius:5px;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #0f172a, #1e2937);
+            color: #e0f2fe;
+        }
+        h1 {
+            margin-bottom: 10px;
+            font-size: 3rem;
+            color: #60a5fa;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .mode-toggle {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        .status {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            min-height: 2.5rem;
+            color: #bae6fd;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            background: #1e2937;
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+        .cell {
+            width: 130px;
+            height: 130px;
+            background: #334155;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #e0f2fe;
+            box-shadow: inset 0 6px 12px rgba(0,0,0,0.4);
+        }
+        .cell:hover { background: #475569; transform: scale(1.05); }
+        .cell.x { color: #60a5fa; }
+        .cell.o { color: #f472b6; }
+        .controls {
+            margin-top: 30px;
+        }
+        button {
+            padding: 12px 32px;
+            font-size: 1.1rem;
+            background: #1e40af;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #3b82f6;
+            transform: translateY(-3px);
+        }
+        .winner { animation: win 0.6s ease; }
+        @keyframes win {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+            100% { transform: scale(1); }
+        }
+    </style>
 </head>
-
 <body>
-
-<div class="toast-layer" id="toastLayer"></div>
-<div class="day-transition" id="dayTransition"></div>
-
-<div id="loginScreen">
-  <div class="box">
-    <h2 class="pixel">Little Valley Farm</h2>
-    <p>Name your farm and start planting. No account needed — your farm is saved right here.</p>
-    <input id="username" placeholder="Farm name" maxlength="16">
-    <button class="big-btn" onclick="login()">Start farming</button>
-    <p id="loginMsg"></p>
-  </div>
-</div>
-
-<div id="game" class="hidden">
-  <div class="header">
-    <div class="stat" id="statDay"><span class="pixel">DAY</span> <span id="day">1</span></div>
-    <div class="stat" id="statSeason"><span id="seasonIcon">🌸</span> <span id="seasonName">Spring</span></div>
-    <div class="stat" id="statMoney">💰 <span id="money">100</span></div>
-    <div class="stat" id="statEnergy">⚡
-      <div class="energybar-wrap"><div class="energybar-fill" id="energyFill" style="width:100%"></div></div>
+    <h1>Tic Tac Toe</h1>
+    
+    <div class="mode-toggle">
+        <label>
+            <input type="checkbox" id="aiMode" onchange="toggleAIMode()">
+            Play against AI
+        </label>
     </div>
-    <div class="stat" id="statSize">🌾 <span id="size">5x5</span></div>
-  </div>
-
-  <div class="main">
-    <div class="field-wrap" id="fieldWrap"><div id="grid" class="grid"></div></div>
-
-    <div class="sidebar">
-      <div class="panel">
-        <h4 class="pixel">Seeds</h4>
-        <div id="seedList"><div style="color:#d8c9ae;">No seeds yet — buy some below.</div></div>
-      </div>
-
-      <div class="panel">
-        <h4 class="pixel">Shop</h4>
-        <div id="shopList"></div>
-      </div>
-
-      <div class="panel">
-        <h4 class="pixel">Water</h4>
-        <div class="shop-item" onclick="upgradeWater()">💧 Better can — $<span id="waterCost">60</span></div>
-        <div class="shop-item" onclick="buyAutoWater()">🚿 Sprinklers — $150</div>
-      </div>
-
-      <div class="panel">
-        <h4 class="pixel">Land</h4>
-        <div class="shop-item" onclick="upgradeFarm()">📈 Expand field — $<span id="upgradeCost">1000</span></div>
-      </div>
-
-      <div class="panel">
-        <h4 class="pixel">Tools</h4>
-        <div class="tool" id="tool_hoe" onclick="selectTool('hoe')">🪓 Till soil</div>
-        <div class="tool" id="tool_plant" onclick="selectTool('plant')">🌱 Plant seed</div>
-        <div class="tool" id="tool_water" onclick="selectTool('water')">💧 Water</div>
-        <div class="tool" id="tool_harvest" onclick="selectTool('harvest')">👋 Harvest</div>
-      </div>
-
-      <button class="big-btn" onclick="nextDay()">🌙 End day, go to sleep</button>
-      <button onclick="logout()">💾 Save farm</button>
+    
+    <div class="status" id="status">X's turn</div>
+    
+    <div class="board" id="board"></div>
+    
+    <div class="controls">
+        <button onclick="resetGame()">New Game</button>
     </div>
-  </div>
-</div>
 
-<script>
-let money=100,energy=100,day=1;
-let tool='hoe',selectedSeed=null;
-let size=5,maxSize=20,upgradeCost=1000;
-let currentUser=null;
-let waterBoost=1,autoWater=false;
-
-const seasons=['spring','summer','fall','winter'];
-const seasonMeta={
-  spring:{icon:'🌸',name:'Spring',particle:'🌸'},
-  summer:{icon:'☀️',name:'Summer',particle:'✨'},
-  fall:{icon:'🍂',name:'Fall',particle:'🍂'},
-  winter:{icon:'❄️',name:'Winter',particle:'❄️'}
-};
-const SEASON_LENGTH=7;
-
-const crops={
-  carrot:{grow:2,value:25,icon:'🥕',price:20,season:'spring'},
-  strawberry:{grow:3,value:50,icon:'🍓',price:30,season:'spring'},
-  corn:{grow:4,value:80,icon:'🌽',price:40,season:'summer'},
-  tomato:{grow:4,value:100,icon:'🍅',price:60,season:'summer'},
-  sunflower:{grow:6,value:350,icon:'🌻',price:120,season:'summer'},
-  pumpkin:{grow:5,value:220,icon:'🎃',price:80,season:'fall'},
-  chili:{grow:4,value:180,icon:'🌶️',price:90,season:'fall'}
-};
-
-let seeds={};
-Object.keys(crops).forEach(c=>seeds[c]=0);
-
-const genericStages=['🌱','🌿','🪴'];
-
-let farm=[];
-let audioCtx=null;
-let particleTimer=null;
-
-function beep(freq,dur,type){
-  try{
-    if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-    const o=audioCtx.createOscillator();
-    const g=audioCtx.createGain();
-    o.type=type||'square';
-    o.frequency.value=freq;
-    g.gain.value=0.06;
-    o.connect(g);g.connect(audioCtx.destination);
-    o.start();
-    g.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+dur);
-    o.stop(audioCtx.currentTime+dur);
-  }catch(e){}
-}
-const sounds={
-  click:()=>beep(440,0.06,'square'),
-  plant:()=>beep(660,0.08,'triangle'),
-  harvest:()=>beep(880,0.12,'triangle'),
-  error:()=>beep(140,0.15,'sawtooth'),
-  upgrade:()=>beep(990,0.18,'triangle'),
-  day:()=>beep(520,0.25,'sine'),
-  gold:()=>{beep(880,0.1,'triangle');setTimeout(()=>beep(1200,0.15,'triangle'),100);}
-};
-
-function toast(msg){
-  const t=document.createElement('div');
-  t.className='toast';
-  t.textContent=msg;
-  toastLayer.appendChild(t);
-  setTimeout(()=>{
-    t.classList.add('out');
-    setTimeout(()=>t.remove(),320);
-  },2600);
-}
-
-function pulseStat(id){
-  const el=document.getElementById(id);
-  if(!el)return;
-  el.classList.remove('pulse');
-  void el.offsetWidth;
-  el.classList.add('pulse');
-}
-
-function spawnParticle(){
-  if(!currentUser)return;
-  const season=getSeason(day);
-  const icon=seasonMeta[season].particle;
-  if(season==='summer'&&Math.random()<0.6)return;
-  const p=document.createElement('div');
-  p.className='weather-particle';
-  p.textContent=icon;
-  p.style.left=Math.random()*90+'%';
-  const dur=3+Math.random()*2.5;
-  p.style.animationDuration=dur+'s';
-  fieldWrap.appendChild(p);
-  setTimeout(()=>p.remove(),dur*1000+100);
-}
-
-function getSeason(d){
-  const idx=Math.floor((d-1)/SEASON_LENGTH)%4;
-  return seasons[idx];
-}
-
-function createFarm(){
-  farm=Array(size*size).fill().map(()=>({tilled:false,type:null,growth:0,watered:false}));
-}
-
-function updateUI(){
-  moneyEl.textContent=money;
-  dayEl.textContent=day;
-  sizeEl.textContent=size+"x"+size;
-  upgradeCostEl.textContent=size>=maxSize?"MAX":upgradeCost;
-  waterCostEl.textContent=60*waterBoost;
-  energyFillEl.style.width=Math.max(0,energy)+"%";
-  const s=getSeason(day);
-  seasonIconEl.textContent=seasonMeta[s].icon;
-  seasonNameEl.textContent=seasonMeta[s].name;
-}
-
-function renderSeeds(){
-  const owned=Object.keys(seeds).filter(s=>seeds[s]>0);
-  if(owned.length===0){
-    seedList.innerHTML='<div style="color:#d8c9ae;">No seeds yet — buy some below.</div>';
-    return;
-  }
-  seedList.innerHTML='';
-  owned.forEach(s=>{
-    let d=document.createElement('div');
-    d.className='shop-item '+(selectedSeed===s?'selected-seed':'');
-    d.textContent=`${crops[s].icon} ${s} x${seeds[s]}`;
-    d.onclick=()=>{selectedSeed=s;sounds.click();renderSeeds();};
-    seedList.appendChild(d);
-  });
-}
-
-function renderShop(){
-  const season=getSeason(day);
-  shopList.innerHTML='';
-  if(season==='winter'){
-    shopList.innerHTML='<div style="color:#d8c9ae;">Nothing grows in winter. Stock up before the frost.</div>';
-    return;
-  }
-  Object.keys(crops).forEach(c=>{
-    const info=crops[c];
-    const inSeason=info.season===season;
-    let d=document.createElement('div');
-    d.className='shop-item'+(inSeason?'':' disabled');
-    d.textContent=`${info.icon} ${c} $${info.price}`;
-    if(inSeason) d.onclick=()=>buySeed(c);
-    shopList.appendChild(d);
-  });
-}
-
-function render(){
-  grid.style.gridTemplateColumns=`repeat(${size},42px)`;
-  grid.innerHTML='';
-  farm.forEach((p,i)=>{
-    let d=document.createElement('div');
-    d.className='plot'+(p.tilled?' tilled':'')+(p.watered?' watered':'')+(p.type?' growing':'');
-    d.dataset.idx=i;
-
-    let icon='';
-    if(p.type){
-      const c=crops[p.type];
-      if(p.growth>=c.grow) icon=c.icon;
-      else{
-        const stageIdx=Math.min(2,Math.floor((p.growth/c.grow)*3));
-        icon=genericStages[stageIdx];
-      }
-    }
-    if(icon){
-      const span=document.createElement('span');
-      span.className='crop-icon';
-      span.textContent=icon;
-      d.appendChild(span);
-    }
-    d.onclick=()=>clickPlot(i);
-    grid.appendChild(d);
-  });
-}
-
-function flashTile(i,cls){
-  const el=grid.children[i];
-  if(!el)return;
-  el.classList.add(cls);
-  setTimeout(()=>el.classList.remove(cls),500);
-}
-
-function popIcon(i){
-  const el=grid.children[i];
-  if(!el)return;
-  const icon=el.querySelector('.crop-icon');
-  if(icon){
-    icon.classList.add('pop');
-    setTimeout(()=>icon.classList.remove('pop'),260);
-  }
-}
-
-function showFloatMoney(i,text){
-  const el=grid.children[i];
-  if(!el)return;
-  const f=document.createElement('div');
-  f.className='float-money';
-  f.textContent=text;
-  el.appendChild(f);
-  setTimeout(()=>f.remove(),820);
-}
-
-function showSparkle(i){
-  const el=grid.children[i];
-  if(!el)return;
-  const s=document.createElement('div');
-  s.className='sparkle-fx';
-  s.textContent='✨';
-  el.appendChild(s);
-  setTimeout(()=>s.remove(),520);
-}
-
-function clickPlot(i){
-  let p=farm[i];
-  if(energy<=0){sounds.error();flashTile(i,'shake');toast('Too tired — go to sleep.');return;}
-
-  if(tool==='hoe'&&!p.tilled&&!p.type){
-    p.tilled=true;energy-=2;sounds.click();
-  }
-  else if(tool==='plant'){
-    if(!selectedSeed){sounds.error();toast('Pick a seed first.');return;}
-    if(!p.tilled||p.type){sounds.error();flashTile(i,'shake');return;}
-    if(seeds[selectedSeed]<=0){sounds.error();return;}
-    const season=getSeason(day);
-    if(crops[selectedSeed].season!==season){
-      sounds.error();flashTile(i,'shake');
-      toast(`${selectedSeed} won't grow in ${seasonMeta[season].name}.`);
-      return;
-    }
-    seeds[selectedSeed]--;p.type=selectedSeed;p.growth=0;energy-=3;
-    sounds.plant();
-    render();updateUI();renderSeeds();popIcon(i);
-    saveGame();
-    return;
-  }
-  else if(tool==='water'&&p.type&&!p.watered){
-    p.watered=true;energy-=2;sounds.click();
-  }
-  else if(tool==='harvest'&&p.type&&p.growth>=crops[p.type].grow){
-    let earned=crops[p.type].value;
-    let bonus=false;
-    if(Math.random()<0.1){earned+=Math.round(crops[p.type].value*0.5);bonus=true;}
-    money+=earned;
-    if(bonus){sounds.gold();}else{sounds.harvest();}
-    p.type=null;p.growth=0;p.watered=false;p.tilled=false;
-    energy-=2;
-    render();updateUI();
-    showFloatMoney(i,'+$'+earned);
-    if(bonus){showSparkle(i);toast(`⭐ Gold star harvest! +$${earned}`);}
-    pulseStat('statMoney');
-    saveGame();
-    return;
-  }
-  else{
-    sounds.error();flashTile(i,'shake');return;
-  }
-
-  saveGame();
-  updateUI();render();renderSeeds();
-}
-
-function nextDay(){
-  dayTransition.classList.remove('playing');
-  void dayTransition.offsetWidth;
-  dayTransition.classList.add('playing');
-
-  const oldSeason=getSeason(day);
-  day++;energy=100;sounds.day();
-  const newSeason=getSeason(day);
-
-  if(newSeason!==oldSeason){
-    let withered=0;
-    farm.forEach(p=>{
-      if(p.type&&crops[p.type].season!==newSeason){
-        p.type=null;p.growth=0;p.watered=false;p.tilled=false;
-        withered++;
-      }
-    });
-    toast(`The season turns to ${seasonMeta[newSeason].name}.`+(withered?` ${withered} crop(s) withered.`:''));
-  }
-
-  if(newSeason!=='winter'){
-    const r=Math.random();
-    if(r<0.2){toast("🌧️ Rain fell overnight — every crop is watered.");farm.forEach(p=>{if(p.type)p.watered=true;});}
-    else if(r<0.3){
-      let lost=0;
-      farm.forEach(p=>{if(p.type&&Math.random()<0.25){p.type=null;p.growth=0;p.watered=false;p.tilled=false;lost++;}});
-      if(lost) toast(`🐛 Bugs got into the field — lost ${lost} crop(s).`);
-    }
-    else if(r<0.4){money+=100;toast("💰 Found a wallet in the field! +$100");pulseStat('statMoney');}
-  }
-
-  farm.forEach(p=>{
-    if(p.type&&(p.watered||autoWater)) p.growth+=waterBoost;
-    p.watered=autoWater;
-  });
-
-  saveGame();
-  updateUI();render();renderShop();
-  pulseStat('statDay');pulseStat('statSeason');pulseStat('statEnergy');
-}
-
-function buySeed(type){
-  const info=crops[type];
-  if(money<info.price){sounds.error();toast('Not enough money.');return;}
-  money-=info.price;seeds[type]+=2;
-  sounds.upgrade();
-  pulseStat('statMoney');
-  saveGame();updateUI();renderSeeds();
-}
-
-function upgradeWater(){
-  const cost=60*waterBoost;
-  if(money<cost){sounds.error();toast('Not enough money.');return;}
-  money-=cost;waterBoost++;
-  sounds.upgrade();
-  toast('Watering can upgraded!');
-  pulseStat('statMoney');
-  saveGame();updateUI();
-}
-
-function buyAutoWater(){
-  if(autoWater){sounds.error();return;}
-  if(money<150){sounds.error();toast('Not enough money.');return;}
-  money-=150;autoWater=true;
-  sounds.upgrade();
-  toast('Sprinklers installed — crops water themselves.');
-  pulseStat('statMoney');
-  saveGame();updateUI();
-}
-
-function upgradeFarm(){
-  if(size>=maxSize){sounds.error();return;}
-  if(money<upgradeCost){sounds.error();toast('Not enough money.');return;}
-  money-=upgradeCost;upgradeCost*=2;size+=5;
-  sounds.upgrade();
-  toast('The field grows bigger!');
-  pulseStat('statMoney');pulseStat('statSize');
-  createFarm();saveGame();updateUI();render();
-}
-
-function selectTool(t){
-  tool=t;
-  sounds.click();
-  document.querySelectorAll('.tool').forEach(e=>e.classList.remove('active'));
-  document.getElementById('tool_'+t).classList.add('active');
-}
-
-async function saveGame(){
-  if(!currentUser) return;
-  try{
-    await window.storage.set('farm:'+currentUser, JSON.stringify({
-      money,energy,day,seeds,farm,size,waterBoost,autoWater,upgradeCost
-    }), false);
-  }catch(e){console.error('save failed',e);}
-}
-
-async function loadGame(){
-  try{
-    const result=await window.storage.get('farm:'+currentUser, false);
-    if(result&&result.value){
-      const s=JSON.parse(result.value);
-      money=s.money;energy=s.energy;day=s.day;
-      seeds=s.seeds;farm=s.farm;
-      size=s.size;waterBoost=s.waterBoost;
-      autoWater=s.autoWater;upgradeCost=s.upgradeCost;
-      return true;
-    }
-  }catch(e){
-    /* no save yet, fresh farm */
-  }
-  return false;
-}
-
-async function login(){
-  const u=username.value.trim();
-  if(!u){loginMsg.textContent="Enter a farm name first.";return;}
-  currentUser=u;
-  loginMsg.textContent="Loading farm...";
-  const had=await loadGame();
-  if(!had) createFarm();
-
-  document.getElementById('loginScreen').classList.add('hidden');
-  document.getElementById('game').classList.remove('hidden');
-  updateUI();render();renderSeeds();renderShop();
-  selectTool('hoe');
-  toast(had?`Welcome back to ${u}!`:`${u} is founded! Till some soil to begin.`);
-
-  if(particleTimer) clearInterval(particleTimer);
-  particleTimer=setInterval(spawnParticle,900);
-}
-
-function logout(){
-  saveGame().then(()=>{toast('Farm saved!');});
-}
-
-const moneyEl=document.getElementById('money');
-const dayEl=document.getElementById('day');
-const sizeEl=document.getElementById('size');
-const upgradeCostEl=document.getElementById('upgradeCost');
-const waterCostEl=document.getElementById('waterCost');
-const energyFillEl=document.getElementById('energyFill');
-const seasonIconEl=document.getElementById('seasonIcon');
-const seasonNameEl=document.getElementById('seasonName');
-const grid=document.getElementById('grid');
-const seedList=document.getElementById('seedList');
-const shopList=document.getElementById('shopList');
-const loginMsg=document.getElementById('loginMsg');
-const username=document.getElementById('username');
-const toastLayer=document.getElementById('toastLayer');
-const dayTransition=document.getElementById('dayTransition');
-const fieldWrap=document.getElementById('fieldWrap');
-
-username.addEventListener('keydown',e=>{if(e.key==='Enter')login();});
-username.focus();
-</script>
-
+    <script>
+        let currentPlayer = 'X';
+        let gameState = ['', '', '', '', '', '', '', '', ''];
+        let gameActive = true;
+        let aiMode = false;
+        
+        const winningConditions = [
+            [0,1,2],[3,4,5],[6,7,8],
+            [0,3,6],[1,4,7],[2,5,8],
+            [0,4,8],[2,4,6]
+        ];
+        
+        const board = document.getElementById('board');
+        const statusDisplay = document.getElementById('status');
+        
+        function createBoard() {
+            board.innerHTML = '';
+            gameState.forEach((_, index) => {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.index = index;
+                cell.addEventListener('click', handleCellClick);
+                board.appendChild(cell);
+            });
+        }
+        
+        function handleCellClick(e) {
+            const index = parseInt(e.target.dataset.index);
+            if (gameState[index] !== '' || !gameActive || (aiMode && currentPlayer === 'O')) return;
+            makeMove(index, e.target);
+        }
+        
+        function makeMove(index, cell) {
+            gameState[index] = currentPlayer;
+            cell.textContent = currentPlayer;
+            cell.classList.add(currentPlayer.toLowerCase());
+            
+            const winResult = checkWin();
+            if (winResult) {
+                gameActive = false;
+                statusDisplay.textContent = `${currentPlayer} wins! 🎉`;
+                highlightWinningCells(winResult);
+                return;
+            }
+            
+            if (gameState.every(c => c !== '')) {
+                gameActive = false;
+                statusDisplay.textContent = "It's a draw! 🤝";
+                return;
+            }
+            
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            statusDisplay.textContent = `${currentPlayer}'s turn`;
+            
+            if (aiMode && currentPlayer === 'O' && gameActive) {
+                setTimeout(aiMove, 350);
+            }
+        }
+        
+        function checkWin() {
+            for (let cond of winningConditions) {
+                const [a,b,c] = cond;
+                if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
+                    return cond;
+                }
+            }
+            return null;
+        }
+        
+        function highlightWinningCells(combo) {
+            combo.forEach(i => board.children[i].classList.add('winner'));
+        }
+        
+        function aiMove() {
+            let bestScore = -Infinity;
+            let bestMove = null;
+            
+            for (let i = 0; i < 9; i++) {
+                if (gameState[i] === '') {
+                    gameState[i] = 'O';
+                    let score = minimax(gameState, 0, false);
+                    gameState[i] = '';
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMove = i;
+                    }
+                }
+            }
+            if (bestMove !== null) {
+                makeMove(bestMove, board.children[bestMove]);
+            }
+        }
+        
+        function minimax(state, depth, isMaximizing) {
+            if (checkWin()) return isMaximizing ? -10 : 10;
+            if (state.every(c => c !== '')) return 0;
+            
+            if (isMaximizing) {
+                let best = -Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (state[i] === '') {
+                        state[i] = 'O';
+                        best = Math.max(best, minimax(state, depth+1, false));
+                        state[i] = '';
+                    }
+                }
+                return best;
+            } else {
+                let best = Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (state[i] === '') {
+                        state[i] = 'X';
+                        best = Math.min(best, minimax(state, depth+1, true));
+                        state[i] = '';
+                    }
+                }
+                return best;
+            }
+        }
+        
+        function toggleAIMode() {
+            aiMode = document.getElementById('aiMode').checked;
+            resetGame();
+        }
+        
+        function resetGame() {
+            currentPlayer = 'X';
+            gameState = ['', '', '', '', '', '', '', '', ''];
+            gameActive = true;
+            statusDisplay.textContent = "X's turn";
+            createBoard();
+        }
+        
+        // Start game
+        createBoard();
+    </script>
 </body>
 </html>
