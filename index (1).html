@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="RedFlag — Community warnings about shady sites and real-time updates on what's going on." />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>RedFlag — Spot the red flags before you click</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #07070b;
+      --bg2: #0e0e14;
+      --surface: #14141c;
+      --surface2: #1c1c27;
+      --surface3: #252533;
+      --border: #2a2a3a;
+      --border-hover: #3d3d52;
+      --text: #f4f4f8;
+      --text2: #c8c8d4;
+      --muted: #8b8b9e;
+      --accent: #ff3b5c;
+      --accent2: #ff6b81;
+      --accent-soft: rgba(255, 59, 92, 0.12);
+      --green: #22c55e;
+      --green-soft: rgba(34, 197, 94, 0.12);
+      --blue: #3b82f6;
+      --blue-soft: rgba(59, 130, 246, 0.12);
+      --yellow: #eab308;
+      --yellow-soft: rgba(234, 179, 8, 0.12);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 12px 40px rgba(0,0,0,0.45);
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7,7,11,0.82);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.7rem 1.1rem;
+    }
+    .header-inner {
+      max-width: 780px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      text-decoration: none;
+      color: inherit;
+    }
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #ff3b5c, #ff7a45);
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      font-size: 1.15rem;
+      box-shadow: 0 4px 14px rgba(255,59,92,0.35);
+    }
+    .logo-text {
+      font-weight: 800;
+      font-size: 1.3rem;
+      letter-spacing: -0.6px;
+    }
+    .logo-text span {
+      background: linear-gradient(135deg, #ff3b5c, #ff8a5c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    button, .btn {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      transition: all 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff3b5c, #ff5c3b);
+      color: white;
+      padding: 0.55rem 1.15rem;
+      box-shadow: 0 4px 16px rgba(255,59,92,0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255,59,92,0.4);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      padding: 0.45rem 0.85rem;
+    }
+    .btn-ghost:hover { color: var(--text); background: var(--surface2); }
+    .btn-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--surface2);
+      color: var(--text2);
+      font-size: 1.05rem;
+    }
+    .btn-icon:hover { background: var(--surface3); color: var(--text); }
+
+    .page {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 1.1rem 1rem 6rem;
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      margin-bottom: 1.4rem;
+    }
+    .search-wrap { position: relative; }
+    .search-wrap input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.75rem 1rem 0.75rem 2.7rem;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .search-wrap input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .search-wrap input::placeholder { color: var(--muted); }
+    .search-icon {
+      position: absolute;
+      left: 0.95rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    .tabs-row {
+      display: flex;
+      gap: 0.4rem;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    .tabs-row::-webkit-scrollbar { display: none; }
+    .tab {
+      flex-shrink: 0;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      transition: all 0.15s;
+    }
+    .tab:hover { color: var(--text); border-color: var(--border-hover); }
+    .tab.active {
+      background: var(--accent-soft);
+      color: var(--accent2);
+      border-color: rgba(255,59,92,0.35);
+    }
+
+    .sort-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    .sort-btns { display: flex; gap: 0.3rem; }
+    .sort-btn {
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      background: transparent;
+    }
+    .sort-btn.active, .sort-btn:hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    .post {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.15rem 1.2rem;
+      margin-bottom: 0.9rem;
+      transition: border-color 0.18s, transform 0.18s;
+      animation: fadeIn 0.35s ease;
+    }
+    .post:hover { border-color: var(--border-hover); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .post-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.7rem;
+    }
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 1rem;
+      color: white;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .post-meta { flex: 1; min-width: 0; }
+    .post-author {
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      padding: 0.18rem 0.5rem;
+      border-radius: 6px;
+    }
+    .badge-warn { background: var(--yellow-soft); color: var(--yellow); }
+    .badge-general { background: var(--blue-soft); color: #93c5fd; }
+    .post-time { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
+
+    .post-title {
+      font-size: 1.12rem;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.2px;
+    }
+    .post-body {
+      color: var(--text2);
+      font-size: 0.935rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-bottom: 0.75rem;
+    }
+    .post-body a { color: var(--accent2); text-decoration: none; }
+    .post-body a:hover { text-decoration: underline; }
+
+    .post-image-wrap {
+      margin-bottom: 0.85rem;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+    }
+    .post-image {
+      width: 100%;
+      max-height: 380px;
+      object-fit: cover;
+      display: block;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .post-image:hover { opacity: 0.92; }
+
+    .post-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+      padding-top: 0.55rem;
+      border-top: 1px solid var(--border);
+    }
+    .action {
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 0.4rem 0.7rem;
+      border-radius: 8px;
+      gap: 0.3rem;
+    }
+    .action:hover { background: var(--surface2); color: var(--text); }
+    .action.upvoted { color: var(--green); }
+    .action.downvoted { color: var(--accent); }
+    .vote-count {
+      min-width: 1.4rem;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .comments {
+      margin-top: 0.9rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+      display: none;
+    }
+    .comments.open { display: block; }
+    .comment {
+      display: flex;
+      gap: 0.6rem;
+      margin-bottom: 0.7rem;
+      animation: fadeIn 0.25s ease;
+    }
+    .comment-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+    .comment-body {
+      flex: 1;
+      background: var(--bg2);
+      border-radius: 12px;
+      padding: 0.55rem 0.8rem;
+      font-size: 0.875rem;
+    }
+    .comment-author { font-weight: 700; font-size: 0.8rem; margin-bottom: 0.15rem; }
+    .comment-text { color: var(--text2); word-break: break-word; }
+    .comment-time { font-size: 0.7rem; color: var(--muted); margin-top: 0.25rem; }
+    .comment-form {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.6rem;
+    }
+    .comment-form input {
+      flex: 1;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.55rem 1rem;
+      color: var(--text);
+      font-size: 0.875rem;
+      font-family: inherit;
+      outline: none;
+    }
+    .comment-form input:focus { border-color: var(--accent); }
+    .comment-form button {
+      background: var(--accent);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .comment-form button:hover { background: var(--accent2); }
+
+    .empty {
+      text-align: center;
+      padding: 4rem 1.5rem;
+      color: var(--muted);
+    }
+    .empty-icon { font-size: 3.5rem; margin-bottom: 1rem; opacity: 0.5; }
+    .empty h3 { color: var(--text); font-size: 1.2rem; margin-bottom: 0.4rem; }
+    .empty p { font-size: 0.95rem; max-width: 320px; margin: 0 auto 1.25rem; }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.72);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0.75rem;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px 20px 16px 16px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 92vh;
+      overflow-y: auto;
+      padding: 1.4rem 1.35rem;
+      box-shadow: var(--shadow);
+      animation: slideUp 0.28s cubic-bezier(0.16,1,0.3,1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.3rem;
+    }
+    .modal-head h2 { font-size: 1.2rem; font-weight: 750; }
+
+    .form-group { margin-bottom: 1.05rem; }
+    .form-group label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.35rem;
+    }
+    input[type="text"], textarea, select {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.7rem 0.9rem;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    textarea { resize: vertical; min-height: 100px; }
+    .char-count {
+      text-align: right;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    .type-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+    .type-opt {
+      padding: 0.75rem 0.6rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    .type-opt:hover { border-color: var(--border-hover); color: var(--text2); }
+    .type-opt.active-warn {
+      border-color: rgba(234,179,8,0.5);
+      background: var(--yellow-soft);
+      color: var(--yellow);
+    }
+    .type-opt.active-general {
+      border-color: rgba(59,130,246,0.5);
+      background: var(--blue-soft);
+      color: #93c5fd;
+    }
+
+    .img-preview {
+      margin-top: 0.6rem;
+      position: relative;
+      display: none;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .img-preview img {
+      width: 100%;
+      max-height: 180px;
+      object-fit: cover;
+      display: block;
+    }
+    .img-preview .rm {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.75);
+      color: white;
+      border: none;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .modal-foot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.55rem;
+      margin-top: 1.2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .fab {
+      position: fixed;
+      bottom: 1.4rem;
+      right: 1.4rem;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff3b5c, #ff5c3b);
+      color: white;
+      font-size: 1.7rem;
+      box-shadow: 0 8px 28px rgba(255,59,92,0.45);
+      z-index: 50;
+      display: none;
+    }
+    .fab:hover { transform: scale(1.06); }
+    @media (max-width: 640px) {
+      .header-right .btn-primary span { display: none; }
+      .fab { display: grid; place-items: center; }
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 1.6rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(90px);
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.7rem 1.4rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      z-index: 400;
+      transition: transform 0.32s cubic-bezier(0.16,1,0.3,1);
+      box-shadow: var(--shadow);
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      cursor: zoom-out;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: 100%;
+      max-height: 90vh;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
+
+    .menu { position: relative; }
+    .menu-drop {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.4rem;
+      min-width: 180px;
+      box-shadow: var(--shadow);
+      display: none;
+      z-index: 150;
+    }
+    .menu-drop.open { display: block; }
+    .menu-item {
+      width: 100%;
+      text-align: left;
+      padding: 0.6rem 0.85rem;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text2);
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    .menu-item:hover { background: var(--surface2); color: var(--text); }
+    .menu-item.danger { color: var(--accent); }
+
+    .stats {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .stats strong { color: var(--text2); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="#" class="logo" onclick="location.reload()">
+        <div class="logo-mark">🚩</div>
+        <div class="logo-text"><span>RedFlag</span></div>
+      </a>
+      <div class="header-right">
+        <div class="menu">
+          <button class="btn-icon" onclick="toggleMenu()" title="Menu">⋯</button>
+          <div class="menu-drop" id="menuDrop">
+            <button class="menu-item" onclick="exportData()">⬇️ Export posts</button>
+            <button class="menu-item" onclick="document.getElementById('importFile').click()">⬆️ Import posts</button>
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)" />
+            <button class="menu-item danger" onclick="clearAll()">🗑️ Clear everything</button>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="openModal()">
+          <span>+ New Post</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="controls">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search" placeholder="Search posts, sites, keywords..." oninput="render()" />
+      </div>
+
+      <div class="tabs-row">
+        <button class="tab active" data-filter="all" onclick="setFilter('all')">All</button>
+        <button class="tab" data-filter="warning" onclick="setFilter('warning')">🚩 Site Warnings</button>
+        <button class="tab" data-filter="general" onclick="setFilter('general')">💬 What's Going On</button>
+      </div>
+
+      <div class="sort-row">
+        <div class="stats" id="stats"></div>
+        <div class="sort-btns">
+          <button class="sort-btn active" data-sort="new" onclick="setSort('new')">New</button>
+          <button class="sort-btn" data-sort="top" onclick="setSort('top')">Top</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="feed"></div>
+  </main>
+
+  <div class="overlay" id="modal">
+    <div class="modal">
+      <div class="modal-head">
+        <h2>Create a post</h2>
+        <button class="btn-icon" onclick="closeModal()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label>Type</label>
+        <div class="type-toggle">
+          <div class="type-opt active-warn" data-type="warning" onclick="selectType('warning')">🚩 Site Warning</div>
+          <div class="type-opt" data-type="general" onclick="selectType('general')">💬 What's Up</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Your name</label>
+        <input type="text" id="author" placeholder="Anonymous" maxlength="24" />
+      </div>
+
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="title" placeholder="What's the red flag?" maxlength="140" oninput="updateCount('title',140)" />
+        <div class="char-count"><span id="titleCount">0</span>/140</div>
+      </div>
+
+      <div class="form-group">
+        <label>Details</label>
+        <textarea id="body" placeholder="Explain the risk, share the link, or tell us what's happening..." maxlength="3000" oninput="updateCount('body',3000)"></textarea>
+        <div class="char-count"><span id="bodyCount">0</span>/3000</div>
+      </div>
+
+      <div class="form-group">
+        <label>Image (optional)</label>
+        <input type="file" id="imageInput" accept="image/*" onchange="previewImage(event)" />
+        <div class="img-preview" id="imgPreview">
+          <img id="previewImg" alt="Preview" />
+          <button class="rm" onclick="removeImage()">✕</button>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary" onclick="submitPost()">Post it</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="fab" onclick="openModal()">+</button>
+  <div class="toast" id="toast"></div>
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <img id="lightboxImg" alt="Full size" />
+  </div>
+
+  <script>
+    let posts = JSON.parse(localStorage.getItem('redflag_posts') || '[]');
+    let filter = 'all';
+    let sort = 'new';
+    let selectedType = 'warning';
+    let imageData = null;
+    let openComments = new Set();
+
+    if (posts.length === 0) {
+      const now = Date.now();
+      posts = [
+        {
+          id: now - 7200000,
+          type: 'warning',
+          author: 'SafetyFirst',
+          title: 'Avoid random “free gift card” survey sites',
+          body: 'Seeing a wave of shady domains promising free Amazon / Steam / Roblox cards after a “quick survey”. They almost always install malware or phish logins.\n\nRule of thumb: if it asks you to download something or enter payment details for a “free” prize → close the tab.',
+          image: null,
+          score: 24,
+          userVote: 0,
+          comments: [
+            { id: 1, author: 'TechAunt', text: 'Lost my Discord account to one of these last month. Stay safe.', time: now - 3600000 },
+            { id: 2, author: 'Anon', text: 'Also check the URL carefully — they often use lookalike domains.', time: now - 1800000 }
+          ],
+          createdAt: now - 7200000
+        },
+        {
+          id: now - 3600000,
+          type: 'general',
+          author: 'NightOwl',
+          title: 'Weird multi-redirect links going around',
+          body: 'Clicked what looked like a normal news link and got bounced through 5 different domains. Browser felt sluggish after. Cleared cache + cookies and it stopped.\n\nAnyone else seeing this?',
+          image: null,
+          score: 11,
+          userVote: 0,
+          comments: [],
+          createdAt: now - 3600000
+        },
+        {
+          id: now - 900000,
+          type: 'warning',
+          author: 'CyberSis',
+          title: 'Fake “account verification” emails for popular services',
+          body: 'Phishing emails pretending to be from banks, Netflix, Discord, Steam etc. are getting really good. Always hover the link (don’t click) and go to the real site yourself.',
+          image: null,
+          score: 18,
+          userVote: 0,
+          comments: [],
+          createdAt: now - 900000
+        }
+      ];
+      save();
+    }
+
+    function save() {
+      localStorage.setItem('redflag_posts', JSON.stringify(posts));
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function linkify(text) {
+      const escaped = escapeHtml(text);
+      return escaped.replace(
+        /(https?:\/\/[^\s<]+)/g,
+        '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+      );
+    }
+
+    function timeAgo(ts) {
+      const s = Math.floor((Date.now() - ts) / 1000);
+      if (s < 60) return 'just now';
+      const m = Math.floor(s / 60);
+      if (m < 60) return m + 'm ago';
+      const h = Math.floor(m / 60);
+      if (h < 24) return h + 'h ago';
+      const d = Math.floor(h / 24);
+      if (d < 30) return d + 'd ago';
+      return new Date(ts).toLocaleDateString();
+    }
+
+    function avatarColor(name) {
+      const colors = [
+        'linear-gradient(135deg,#6366f1,#a855f7)',
+        'linear-gradient(135deg,#ec4899,#f43f5e)',
+        'linear-gradient(135deg,#14b8a6,#06b6d4)',
+        'linear-gradient(135deg,#f59e0b,#ef4444)',
+        'linear-gradient(135deg,#8b5cf6,#6366f1)',
+        'linear-gradient(135deg,#10b981,#3b82f6)'
+      ];
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+      return colors[Math.abs(hash) % colors.length];
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2400);
+    }
+
+    function render() {
+      const feed = document.getElementById('feed');
+      const q = (document.getElementById('search').value || '').toLowerCase().trim();
+
+      let list = [...posts];
+
+      if (filter !== 'all') list = list.filter(p => p.type === filter);
+      if (q) {
+        list = list.filter(p =>
+          (p.title + ' ' + p.body + ' ' + p.author).toLowerCase().includes(q)
+        );
+      }
+
+      if (sort === 'top') list.sort((a, b) => b.score - a.score || b.createdAt - a.createdAt);
+      else list.sort((a, b) => b.createdAt - a.createdAt);
+
+      const warnCount = posts.filter(p => p.type === 'warning').length;
+      document.getElementById('stats').innerHTML =
+        `<span><strong>${posts.length}</strong> posts</span>
+         <span><strong>${warnCount}</strong> warnings</span>`;
+
+      if (list.length === 0) {
+        feed.innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">📭</div>
+            <h3>Nothing here yet</h3>
+            <p>Be the first to raise a red flag or share what’s going on.</p>
+            <button class="btn-primary" onclick="openModal()">+ Create first post</button>
+          </div>`;
+        return;
+      }
+
+      feed.innerHTML = list.map(p => {
+        const commentsOpen = openComments.has(p.id);
+        return `
+        <article class="post" data-id="${p.id}">
+          <div class="post-top">
+            <div class="avatar" style="background:${avatarColor(p.author)}">${(p.author || 'A')[0].toUpperCase()}</div>
+            <div class="post-meta">
+              <div class="post-author">
+                ${escapeHtml(p.author || 'Anonymous')}
+                <span class="badge ${p.type === 'warning' ? 'badge-warn' : 'badge-general'}">
+                  ${p.type === 'warning' ? 'Site Warning' : "What's Up"}
+                </span>
+              </div>
+              <div class="post-time">${timeAgo(p.createdAt)}</div>
+            </div>
+          </div>
+
+          <h3 class="post-title">${escapeHtml(p.title)}</h3>
+          ${p.body ? `<div class="post-body">${linkify(p.body)}</div>` : ''}
+          ${p.image ? `
+            <div class="post-image-wrap">
+              <img class="post-image" src="${p.image}" alt="Post image" loading="lazy"
+                   onclick="openLightbox('${p.image}')" />
+            </div>` : ''}
+
+          <div class="post-actions">
+            <button class="action ${p.userVote === 1 ? 'upvoted' : ''}" onclick="vote(${p.id},1)">
+              ▲ <span class="vote-count">${p.score}</span>
+            </button>
+            <button class="action ${p.userVote === -1 ? 'downvoted' : ''}" onclick="vote(${p.id},-1)">▼</button>
+            <button class="action" onclick="toggleComments(${p.id})">
+              💬 ${p.comments?.length || 0}
+            </button>
+            <button class="action" onclick="copyPost(${p.id})">🔗 Copy</button>
+            <button class="action" onclick="deletePost(${p.id})" style="margin-left:auto">🗑️</button>
+          </div>
+
+          <div class="comments ${commentsOpen ? 'open' : ''}" id="comments-${p.id}">
+            ${(p.comments || []).map(c => `
+              <div class="comment">
+                <div class="comment-avatar" style="background:${avatarColor(c.author)}">${(c.author || 'A')[0].toUpperCase()}</div>
+                <div class="comment-body">
+                  <div class="comment-author">${escapeHtml(c.author || 'Anonymous')}</div>
+                  <div class="comment-text">${escapeHtml(c.text)}</div>
+                  <div class="comment-time">${timeAgo(c.time)}</div>
+                </div>
+              </div>
+            `).join('')}
+            <div class="comment-form">
+              <input type="text" placeholder="Add a comment..." id="cinput-${p.id}"
+                     onkeydown="if(event.key==='Enter')addComment(${p.id})" maxlength="500" />
+              <button onclick="addComment(${p.id})">➤</button>
+            </div>
+          </div>
+        </article>`;
+      }).join('');
+    }
+
+    function setFilter(f) {
+      filter = f;
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.filter === f));
+      render();
+    }
+
+    function setSort(s) {
+      sort = s;
+      document.querySelectorAll('.sort-btn').forEach(b => b.classList.toggle('active', b.dataset.sort === s));
+      render();
+    }
+
+    function vote(id, dir) {
+      const p = posts.find(x => x.id === id);
+      if (!p) return;
+      if (p.userVote === dir) {
+        p.score -= dir;
+        p.userVote = 0;
+      } else {
+        p.score += dir - (p.userVote || 0);
+        p.userVote = dir;
+      }
+      save();
+      render();
+    }
+
+    function toggleComments(id) {
+      if (openComments.has(id)) openComments.delete(id);
+      else openComments.add(id);
+      render();
+    }
+
+    function addComment(id) {
+      const input = document.getElementById('cinput-' + id);
+      const text = (input?.value || '').trim();
+      if (!text) return;
+      const p = posts.find(x => x.id === id);
+      if (!p) return;
+      if (!p.comments) p.comments = [];
+      const name = localStorage.getItem('redflag_name') || 'Anonymous';
+      p.comments.push({
+        id: Date.now(),
+        author: name,
+        text,
+        time: Date.now()
+      });
+      openComments.add(id);
+      save();
+      render();
+      showToast('Comment added');
+    }
+
+    function deletePost(id) {
+      if (!confirm('Delete this post permanently?')) return;
+      posts = posts.filter(p => p.id !== id);
+      openComments.delete(id);
+      save();
+      render();
+      showToast('Post deleted');
+    }
+
+    function copyPost(id) {
+      const p = posts.find(x => x.id === id);
+      if (!p) return;
+      const text = `${p.title}\n\n${p.body || ''}\n\n— via RedFlag`;
+      navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard'));
+    }
+
+    function openLightbox(src) {
+      document.getElementById('lightboxImg').src = src;
+      document.getElementById('lightbox').classList.add('open');
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+    }
+
+    function openModal() {
+      document.getElementById('modal').classList.add('open');
+      document.getElementById('author').value = localStorage.getItem('redflag_name') || '';
+      document.getElementById('title').value = '';
+      document.getElementById('body').value = '';
+      document.getElementById('titleCount').textContent = '0';
+      document.getElementById('bodyCount').textContent = '0';
+      removeImage();
+      selectType('warning');
+      setTimeout(() => document.getElementById('title').focus(), 100);
+    }
+    function closeModal() {
+      document.getElementById('modal').classList.remove('open');
+    }
+
+    function selectType(t) {
+      selectedType = t;
+      document.querySelectorAll('.type-opt').forEach(el => {
+        el.classList.remove('active-warn', 'active-general');
+        if (el.dataset.type === t) {
+          el.classList.add(t === 'warning' ? 'active-warn' : 'active-general');
+        }
+      });
+    }
+
+    function updateCount(id, max) {
+      const el = document.getElementById(id);
+      document.getElementById(id + 'Count').textContent = el.value.length;
+    }
+
+    function previewImage(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 2.5 * 1024 * 1024) {
+        showToast('Image too large (max ~2.5 MB)');
+        e.target.value = '';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = ev => {
+        imageData = ev.target.result;
+        document.getElementById('previewImg').src = imageData;
+        document.getElementById('imgPreview').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+    function removeImage() {
+      imageData = null;
+      document.getElementById('imageInput').value = '';
+      document.getElementById('imgPreview').style.display = 'none';
+    }
+
+    function submitPost() {
+      const title = document.getElementById('title').value.trim();
+      const body = document.getElementById('body').value.trim();
+      const author = document.getElementById('author').value.trim() || 'Anonymous';
+
+      if (!title) {
+        showToast('Please add a title');
+        return;
+      }
+
+      localStorage.setItem('redflag_name', author);
+
+      posts.unshift({
+        id: Date.now(),
+        type: selectedType,
+        author,
+        title,
+        body,
+        image: imageData,
+        score: 1,
+        userVote: 1,
+        comments: [],
+        createdAt: Date.now()
+      });
+      save();
+      closeModal();
+      filter = 'all';
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.filter === 'all'));
+      render();
+      showToast('🚩 Posted!');
+    }
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify(posts, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'redflag-posts.json';
+      a.click();
+      showToast('Exported');
+      closeMenu();
+    }
+
+    function importData(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (Array.isArray(data)) {
+            posts = data;
+            save();
+            render();
+            showToast('Imported ' + data.length + ' posts');
+          } else showToast('Invalid file');
+        } catch {
+          showToast('Could not read file');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+      closeMenu();
+    }
+
+    function clearAll() {
+      if (!confirm('Delete ALL posts and comments? This cannot be undone.')) return;
+      posts = [];
+      openComments.clear();
+      save();
+      render();
+      showToast('Everything cleared');
+      closeMenu();
+    }
+
+    function toggleMenu() {
+      document.getElementById('menuDrop').classList.toggle('open');
+    }
+    function closeMenu() {
+      document.getElementById('menuDrop').classList.remove('open');
+    }
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.menu')) closeMenu();
+      if (e.target.id === 'modal') closeModal();
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        closeModal();
+        closeLightbox();
+        closeMenu();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>
